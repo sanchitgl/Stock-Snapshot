@@ -70,7 +70,7 @@ def get_financials(stock_ticker):
     df['net_cash'] = df['cash_eq'] -(df['st_debt'].fillna(0)+df['lg_debt'].fillna(0))
     df['shares_out']= pd.to_numeric(pd.Series(scrape_values2('Weighted Avg. Shares Outs.',page_body)),errors= 'coerce')
 
-    df = df.loc[df['date']>= 2000]
+    df = df.loc[df['date']>= 2002]
 
     quote = {'MarketCapitalization':str(scrape_quote('>P/E to S\&amp\;P500',page_body)),
                 'Name' : company_name }

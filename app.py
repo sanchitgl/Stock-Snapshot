@@ -92,7 +92,7 @@ def plot_change_chart(data,X,Y):
     y=alt.Y('changeYoY',type="quantitative"#, axis=alt.Axis(format='%')
     , title=""),
     color=alt.value("#aec7e8"),
-    tooltip = [alt.Tooltip('changeYoY', title='')]
+    tooltip = [alt.Tooltip('changeYoY', title='',format='.1f')]
     )).interactive()
     line = (alt.Chart(data).mark_line(point = True).transform_window(
         # The field to average
@@ -103,8 +103,7 @@ def plot_change_chart(data,X,Y):
         x=alt.X(X, type="nominal", title=""),
         y='rolling_mean:Q',
         color=alt.value("#ffbb78"),
-        opacity= alt.value(0.7),
-        tooltip = [alt.Tooltip('rolling_mean:Q', title='3 Yr Avg')]
+        tooltip = [alt.Tooltip('rolling_mean:Q', title='3 Yr Avg',format='.1f')]
         )).interactive()
     change_chart = (chart + line).interactive()
     st.altair_chart(change_chart, use_container_width=True)
@@ -121,7 +120,7 @@ def plot_bar_chart2(data,X,Y,T):
             alt.value("#74c476"),  # The positive color
             alt.value("#d6616b")  # The negative color
             ),
-            tooltip = [alt.Tooltip(Y, title=T)]
+            tooltip = [alt.Tooltip(Y, title=T,format='.1f')]
             #color=alt.Color("variable", type="nominal", title=""),
             #order=alt.Order("variable", sort="descending"),
         )
@@ -156,7 +155,7 @@ def plot_bar_chart(data,X,Y,T):
         y='rolling_mean:Q',
         color=alt.value("#636363"),
         opacity= alt.value(0.7),
-        tooltip = [alt.Tooltip('rolling_mean:Q', title='3 Yr Avg')]
+        tooltip = [alt.Tooltip('rolling_mean:Q', title='3 Yr Avg',format='.1f')]
         )
 
     chart = (bar + line).configure_title(fontSize=20)
