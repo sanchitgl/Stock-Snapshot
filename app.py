@@ -23,29 +23,35 @@ def landing_page():
         st.header(quote['Name']+' financial overview')
         st.write("##")
         rev, net_inc, fcf = st.columns(3)
-        debt_eq, shares_out, cash = st.columns(3)
+        debt_eq, cash, shares_out, = st.columns(3)
         with rev:
             #st.subheader('Revenue')
             plot_bar_chart(data,'date','Revenue','Revenue (mill)')
+            with st.expander("Percent chnage YoY"):
+                plot_change_chart(data,'date','Revenue')
         with net_inc:
             #st.subheader('Net Income')
             plot_bar_chart(data,'date','Net_inc','Net Income (mill)')
+            with st.expander("Percent chnage YoY"):
+                plot_change_chart(data,'date','Net_inc')
         with fcf:
             #st.subheader('Free Cash Flow')
             plot_bar_chart(data,'date','Fcf','Free Cash Flow (mill)')
+            with st.expander("Percent chnage YoY"):
+                plot_change_chart(data,'date','Fcf')
         with debt_eq:
             #st.subheader('Debt/Equity')
             plot_bar_chart2(data,'date','Debt_eq','Debt/Equity')
+        with cash:
+            #st.subheader('Cash & Equivalents')
+            plot_bar_chart2(data,'date','net_cash','Cash - Tot Debt')
         with shares_out:
             #st.subheader('Shares Outstanding')
             plot_bar_chart2(data,'date','shares_out','Shares Outstanding (mill)')
-        with cash:
-            #st.subheader('Cash & Equivalents')
-            plot_bar_chart2(data,'date','net_cash','Cash & Eq - Tot Debt (mill)')
 
         st.header('Valuation')
         
-        if dcf_value != 'NA':
+        if dcf_value != 'NA' and dcf_value >= 0:
             if 'T' in quote['MarketCapitalization']:
                 quote['MarketCapitalization'] = re.sub(r'T', '', quote['MarketCapitalization'])
                 quote['MarketCapitalization'] = 1000000*float(quote['MarketCapitalization'])
@@ -76,27 +82,32 @@ def landing_page():
         else:
             st.warning("Sorry, DCF Calculation doesn't work on loss making companies.")
         
-def plot_bar_chart3(data,X,Y,T):
+def plot_change_chart(data,X,Y):
     #data['changeYoY'] = data[Y].diff() / data[Y].abs().shift()
-    data['changeYoY'] = data[Y].rolling(3).mean()
-    base = alt.Chart(data, title=T).encode(x=alt.X(X, type="nominal", title=""))
-    bar = base.mark_bar().encode(y=alt.Y(Y, type="quantitative", title=""), color=alt.condition(
-            alt.datum[Y] > 0,
-            alt.value('#74c476'),  # The positive color
-            alt.value("#d6616b")  # The negative color
-            ),tooltip = [alt.Tooltip(Y, title=T)])
-    line =  base.mark_line(point = True).encode(
-    y=alt.Y('changeYoY',type="quantitative",bin=alt.Bin(maxbins = 8)#, axis=alt.Axis(format='%')
+    data['changeYoY'] = (data[Y].diff() / data[Y].abs().shift())*100
+    #print(data['changeYoY'])
+
+    chart = (alt.Chart(data).mark_line(point = True).encode(
+    x=alt.X(X, type="nominal", title=""),
+    y=alt.Y('changeYoY',type="quantitative"#, axis=alt.Axis(format='%')
     , title=""),
-    color=alt.value("#636363"),
-    opacity= alt.value(0.7),
-    tooltip = [alt.Tooltip('changeYoY', title='Percent change', format='.0%')]
-    )
-    chart = alt.layer(bar, line).resolve_scale(
-        y = 'independent'
-        ).configure_title(fontSize=20)
-    #chart = chart + chart.transform_regression(X, 'changeYoY').mark_line()
-    st.altair_chart(chart, use_container_width=True)
+    color=alt.value("#aec7e8"),
+    tooltip = [alt.Tooltip('changeYoY', title='')]
+    )).interactive()
+    line = (alt.Chart(data).mark_line(point = True).transform_window(
+        # The field to average
+        rolling_mean='mean(changeYoY)',
+        # The number of values before and after the current value to include.
+        frame=[-2, 0]
+        ).encode(
+        x=alt.X(X, type="nominal", title=""),
+        y='rolling_mean:Q',
+        color=alt.value("#ffbb78"),
+        opacity= alt.value(0.7),
+        tooltip = [alt.Tooltip('rolling_mean:Q', title='3 Yr Avg')]
+        )).interactive()
+    change_chart = (chart + line).interactive()
+    st.altair_chart(change_chart, use_container_width=True)
 
 def plot_bar_chart2(data,X,Y,T):
     chart = (
@@ -115,7 +126,7 @@ def plot_bar_chart2(data,X,Y,T):
             #order=alt.Order("variable", sort="descending"),
         )
     )
-
+    
     st.altair_chart(chart, use_container_width=True)
 
 def plot_bar_chart(data,X,Y,T):
@@ -180,7 +191,7 @@ def get_stock_tickr():
             st.write("##")
             st.text(" OR ")
         with gr_num:
-            gr_num = st.number_input('Input Growth rate', 0.0, 100.0, 12.0, 0.5)
+            gr_num = st.number_input('Input Growth rate', 0.0, 100.0, 12.0, 0.5, help = 'Growth rate for next 10 years \nlow: 5 \nmoderate: 10 \nhigh: 15')
         with slowdown:
             sl = st.number_input('Slowdown rate YoY', 0.0, 100.0, 0.5,0.5)
         with discount:
