@@ -11,6 +11,7 @@ def landing_page():
     st.subheader("Get a Financial overview of companies and their intrinsic value!")
     st.write("##")
     submit, tckr, growth, sl, dr = get_stock_tickr()
+    print(tckr)
 
     if submit == True:
         try:
@@ -66,7 +67,7 @@ def landing_page():
             val_df = pd.DataFrame(val_data, columns=['Label', 'Value'])
             #val_df = val_df.set_index('Label')
 
-            print(val_df)
+            #print(val_df)
             #plot_bar_chart(val_df)
             plot_val_chart(val_df,'Value','Label')
             #st.bar_chart(val_df)
