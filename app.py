@@ -74,7 +74,7 @@ def landing_page():
             st.write("DCF Valuation:  "+str(int(dcf_value)))
             st.write("Current MCap:  "+str(int(quote['MarketCapitalization'])))
             
-            margin_of_safety = int(((dcf_value-quote['MarketCapitalization'])/quote['MarketCapitalization'])*100)
+            margin_of_safety = int(((dcf_value/quote['MarketCapitalization'])-1)*100)
             if margin_of_safety <= 0:
                 st.write(f'<b style="color:#d6616b">{"Margin of Safety:  "+str(margin_of_safety)+"%"}</b>', unsafe_allow_html=True)
             else:
