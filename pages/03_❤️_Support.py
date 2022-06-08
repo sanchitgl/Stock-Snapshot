@@ -1,6 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
+st.balloons()
 col1, col2, col3 = st.columns([1,2.5,1])
 with col2:
     st.image("https://media.giphy.com/media/AgHBbekqDik0g/giphy.gif", width = 400)
