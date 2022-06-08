@@ -22,6 +22,8 @@ def landing_page():
         st.subheader("Access to 20 Years of Financial data and Intrinsic value Calculation! ")
     st.sidebar.markdown("# Stock Overview") 
     st.sidebar.markdown("Get 20 year+ financial data and charts on relevant metrics")
+    st.write('##')
+    st.sidebar.markdown("Quarterly Data and charts are coming soon!")
     #st.title("Investment Buddy")
     #st.subheader("Get a Financial overview of companies and their intrinsic value!")
     st.write("##")
