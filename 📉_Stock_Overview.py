@@ -20,6 +20,7 @@ def landing_page():
     with title:
         st.title(" Your One-stop Stock Analysis Tool")
         st.subheader("Access to 20 Years of Financial data and Intrinsic value Calculation! ")
+    st.markdown("Quarterly data and charts are coming soon!")
     st.sidebar.markdown("# Stock Overview") 
     st.sidebar.markdown("Get 20 year+ financial data and charts on relevant metrics")
     st.write('##')
