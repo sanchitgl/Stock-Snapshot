@@ -27,7 +27,6 @@ def landing_page():
     st.sidebar.markdown("Quarterly Data and charts are coming soon!")
     #st.title("Investment Buddy")
     #st.subheader("Get a Financial overview of companies and their intrinsic value!")
-    st.write("##")
     submit, tckr = get_stock_tickr()
     print(tckr)
 
