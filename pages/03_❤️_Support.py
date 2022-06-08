@@ -8,7 +8,7 @@ st.write('##')
 
 col1, col2, col3 = st.columns([0.5,4.5,0.5])
 with col2:
-    st.write("<h4 style='text-align: center;'>If you like my work and find value in it, please consider supporting. Your support will go a long way and allow me to continue working on such projects. Thank You ❤️ </h4>", unsafe_allow_html=True)
+    st.write("<h4 style='text-align: center;'>If you like my work and find value in it, please consider supporting. Your support will go a long way in allowing me to continue working on such projects. Thank You ❤️ </h4>", unsafe_allow_html=True)
 
 # col1, col2, col3 = st.columns(3)
 # with col2:
