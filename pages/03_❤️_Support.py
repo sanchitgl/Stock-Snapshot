@@ -12,7 +12,7 @@ col1, col2, col3 = st.columns(3)
 with col2:
     st.write(f'''
         <div class="text-centerr">
-            <a target="_blank" href="https://buymeacoffee.com/stocksnapsP">
+            <a target="_blank" href="https://buymeacoffee.com/stocksnapshot">
                 <button>
                     Buy me a Green Tea 🍵
                 </button>
