@@ -56,94 +56,90 @@ def get_financials(stock_ticker):
     name = soup.find('title')
     company_name = name.string.split('·')[0]
 
-    df = pd.DataFrame()
+    df_inc = pd.DataFrame()
 
-    df['date'] = pd.to_numeric(pd.Series(scrape_dates(page_body)),errors= 'coerce')
-    df['Revenue'] = pd.to_numeric(pd.Series(scrape_values('Revenue',page_body)),errors= 'coerce')
-    df['Net_inc'] = pd.to_numeric(pd.Series(scrape_values('Net Income',page_body)),errors= 'coerce')
-    df['Fcf'] = pd.to_numeric(pd.Series(scrape_values('Free Cash Flow',page_body)),errors= 'coerce')
-    df['st_debt']= pd.to_numeric(pd.Series(scrape_values2('>Short\-Term Debt',page_body)),errors= 'coerce')
-    df['lg_debt']= pd.to_numeric(pd.Series(scrape_values2('Long\-Term Debt',page_body)),errors= 'coerce')
-    df['cash_eq']= pd.to_numeric(pd.Series(scrape_values2('Cash \&amp\; Short-Term Investments',page_body)),errors= 'coerce')
-    df['st_equity']= pd.to_numeric(pd.Series(scrape_values('Total Stockholders Equity',page_body)),errors= 'coerce')
-    df['Debt_eq'] = (df['lg_debt']+df['st_debt'])/df['st_equity']
-    df['net_cash'] = df['cash_eq'] -(df['st_debt'].fillna(0)+df['lg_debt'].fillna(0))
-    df['shares_out']= pd.to_numeric(pd.Series(scrape_values2('Weighted Avg. Shares Outs.',page_body)),errors= 'coerce')
+    df_inc['date'] = pd.to_numeric(pd.Series(scrape_dates(page_body)),errors= 'coerce')
+    df_inc['Revenue'] = pd.to_numeric(pd.Series(scrape_values('Revenue',page_body)),errors= 'coerce')
+    df_inc['COGS'] = pd.to_numeric(pd.Series(scrape_values2('>COGS',page_body)),errors= 'coerce')
+    df_inc['Gross Profit'] = pd.to_numeric(pd.Series(scrape_values('Gross Profit',page_body)),errors= 'coerce')
+    df_inc['Operating Income'] = pd.to_numeric(pd.Series(scrape_values('Operating Income',page_body)),errors= 'coerce')
+    df_inc['Net_inc'] = pd.to_numeric(pd.Series(scrape_values('Net Income',page_body)),errors= 'coerce')
+    df_inc['shares_out']= pd.to_numeric(pd.Series(scrape_values2('Weighted Avg. Shares Outs.',page_body)),errors= 'coerce')
+    df_inc['EPS'] = pd.to_numeric(pd.Series(scrape_values2('EPS',page_body)),errors= 'coerce')
 
-    df = df.loc[df['date']>= 2002]
+    df_bal = pd.DataFrame()
+    df_bal['date'] = pd.to_numeric(pd.Series(scrape_dates(page_body)),errors= 'coerce')
+    df_bal['cash_eq']= pd.to_numeric(pd.Series(scrape_values2('Cash \&amp\; Short-Term Investments',page_body)),errors= 'coerce')
+    df_bal['Total Current Assets']= pd.to_numeric(pd.Series(scrape_values('Total Current Assets',page_body)),errors= 'coerce')
+    df_bal['Total Non-Current Assets']= pd.to_numeric(pd.Series(scrape_values2('Total Non-Current Assets',page_body)),errors= 'coerce')
+    df_bal['Total Assets']= pd.to_numeric(pd.Series(scrape_values('Total Assets',page_body)),errors= 'coerce')
+    df_bal['st_debt']= pd.to_numeric(pd.Series(scrape_values2('>Short\-Term Debt',page_body)),errors= 'coerce')
+    df_bal['Total Current Liabilities']= pd.to_numeric(pd.Series(scrape_values('Total Current Liabilities',page_body)),errors= 'coerce')
+    df_bal['lg_debt']= pd.to_numeric(pd.Series(scrape_values2('Long\-Term Debt',page_body)),errors= 'coerce')
+    df_bal['Total Non-Current Liabilities']= pd.to_numeric(pd.Series(scrape_values2('Total Non-Current Liabilities',page_body)),errors= 'coerce')
+    df_bal['Total Liabilities']= pd.to_numeric(pd.Series(scrape_values('Total Liabilities',page_body)),errors= 'coerce')
+    df_bal['Retained Earnings']= pd.to_numeric(pd.Series(scrape_values2('Retained Earnings',page_body)),errors= 'coerce')
+    df_bal['st_equity']= pd.to_numeric(pd.Series(scrape_values('Total Stockholders Equity',page_body)),errors= 'coerce')
+    df_bal['Debt_eq']= (df_bal['lg_debt']+df_bal['st_debt'])/df_bal['st_equity']
+    df_bal['net_cash']= df_bal['cash_eq'] -(df_bal['st_debt'].fillna(0)+df_bal['lg_debt'].fillna(0))
+
+    df_cash = pd.DataFrame()
+    df_cash['date'] = pd.to_numeric(pd.Series(scrape_dates(page_body)),errors= 'coerce')
+    df_cash['Cash From Operations'] = pd.to_numeric(pd.Series(scrape_values('Cash Provided by Operating Activities',page_body)),errors= 'coerce')
+    df_cash['CAPEX'] = pd.to_numeric(pd.Series(scrape_values2('CAPEX',page_body)),errors= 'coerce')
+    df_cash['Fcf'] = pd.to_numeric(pd.Series(scrape_values('Free Cash Flow',page_body)),errors= 'coerce')
+    df_cash['Acquisitions Net'] = pd.to_numeric(pd.Series(scrape_values2('Acquisitions Net',page_body)),errors= 'coerce')
+    df_cash['Cash Used-Investing Act'] = pd.to_numeric(pd.Series(scrape_values('Cash Used for Investing Activities',page_body)),errors= 'coerce')
+    df_cash['Debt Repayment'] = pd.to_numeric(pd.Series(scrape_values2('Debt Repayment',page_body)),errors= 'coerce')
+    df_cash['Stock Issued'] = pd.to_numeric(pd.Series(scrape_values2('Common Stock Issued',page_body)),errors= 'coerce')
+    df_cash['Stock Repurchased'] = pd.to_numeric(pd.Series(scrape_values2('Common Stock Repurchased',page_body)),errors= 'coerce')
+    df_cash['Dividends'] = pd.to_numeric(pd.Series(scrape_values2('Dividends Paid',page_body)),errors= 'coerce')
+    df_cash['Cash by Financing Act'] = pd.to_numeric(pd.Series(scrape_values('Cash Used/Provided by Financing Activities',page_body)),errors= 'coerce')
+    df_cash['Net Change in Cash'] = pd.to_numeric(pd.Series(scrape_values('Net Change In Cash',page_body)),errors= 'coerce')
+
+
+    df_inc = df_inc.loc[df_inc['date']>= 2002]
+    df_bal = df_bal.loc[df_bal['date']>= 2002]
+    df_cash = df_cash.loc[df_cash['date']>= 2002]
 
     quote = {'MarketCapitalization':str(scrape_quote('>P/E to S\&amp\;P500',page_body)),
                 'Name' : company_name }
     # df.index = pd.to_datetime(df.index).year
     # df['date'] = df.index 
     #print(df.index)
-    return quote, df
+    return quote, df_inc, df_bal, df_cash
 
-def AvgGrowth(x, growth):
-    if growth == '3yr Avg':
-        rate = ((x[-1]/x[-4])**(1/3))-1
-        print(rate)
-        if rate <= 0.4:
-            growth_rate = rate
-        else:
-            growth_rate = 0.4
-    elif growth == '5yr Avg':
-        rate = ((x[-1]/x[-6])**(1/5))-1
-        if rate <= 0.4:
-            growth_rate = rate
-        else:
-            growth_rate = 0.4
-    return growth_rate
-    
-def CAGR(fcf):
-    cagr = (fcf[-1]/fcf[0])**(1/(len(fcf)-1))-1
-    return cagr
+def get_quote(stock_ticker):
+    page = requests.get('https://roic.ai/financials/'+stock_ticker)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    page_body = soup.body
+     
+    name = soup.find('title')
+    company_name = name.string.split('·')[0]
 
-def DCFvalue(x,growth,margin,discount):
-    fcf = (x[-3]+x[-2]+x[-1])/3
-    if growth in ['3yr Avg','5yr Avg']:
-        totgrowth = AvgGrowth(x,growth)
-        print(totgrowth)
-    else:
-        totgrowth = growth/100
-    totfcf = []
-    n = 0
-    while totgrowth>0 and n <10:
-        if fcf <= 0:
-            fcf_growth = (-1)*(fcf*(totgrowth))
-            fcf = fcf + fcf_growth
-        else:
-            fcf = fcf*((1+totgrowth))
-        totfcf.append(fcf)
-        totgrowth = totgrowth-margin       
-        n += 1
-    npv = get_npv(discount,totfcf)
-    if totgrowth <= 0.05:
-        terminal_value = totfcf[-1]/(discount- totgrowth)
-    else:
-        terminal_value = totfcf[-1]/(discount- 0.05)
-    total_npv = npv+terminal_value
-    #total_npv = terminal_value
-    return total_npv
+    NI = pd.to_numeric(pd.Series(scrape_values('Net Income',page_body)),errors= 'coerce')
+    NI = list(NI)
+    FCF = pd.to_numeric(pd.Series(scrape_values('Free Cash Flow',page_body)),errors= 'coerce')
+    FCF = list(FCF)
+    quote = {'MarketCapitalization':str(scrape_quote('>P/E to S\&amp\;P500',page_body)),
+                'Name' : company_name }
+    return NI, FCF, quote
 
-def get_npv(rate, values):
-    values = np.asarray(values)
-    return (values / (1+rate)**np.arange(1,len(values)+1)).sum(axis=0)
 
-def main(company_ticker, growth, sl, dr):
-    quote, data = get_financials(company_ticker)
-    #print("---------")
-    #print(data.index)
-    fcf = list(data['Fcf'])
-    NI = list(data['Net_inc'])
+# def main(company_ticker):
+#     quote, data = get_financials(company_ticker)
+#     #print("---------")
+#     #print(data.index)
+#     fcf = list(data['Fcf'])
+#     NI = list(data['Net_inc'])
 
-    if fcf[-1] > 0:
-        int_value = DCFvalue(fcf, growth, sl/100, dr/100)
-    elif NI[-1] >0:
-        int_value = DCFvalue(NI, growth, sl/100, dr/100)
-    else:
-        int_value = 'NA'
+#     # if fcf[-1] > 0:
+#     #     int_value = DCFvalue(fcf, growth, sl/100, dr/100)
+#     # elif NI[-1] >0:
+#     #     int_value = DCFvalue(NI, growth, sl/100, dr/100)
+#     # else:
+#     #     int_value = 'NA'
 
-    return quote, data, int_value
+#     return quote, data
         
 #quote, df = get_financials('BABA')

@@ -3,24 +3,45 @@ import streamlit as st
 from Stock_scrape_dcf import *
 import re
 import altair as alt
+from functools import reduce
+from PIL import Image
 #import plotly.express as px
 
 def landing_page():
-    st.set_page_config(layout="wide")
-    st.title("Investment Buddy")
-    st.subheader("Get a Financial overview of companies and their intrinsic value!")
+    img = Image.open('images/7b5298e4cd264eb283b80da981337b58.png')
+    st.set_page_config(
+     page_title="Stock Snapshot",
+     page_icon=img,
+     layout="wide")
+
+    logo, title = st.columns([1,4])
+    with logo:
+        st.image(img)
+    with title:
+        st.title(" Your One-stop Stock Analysis Tool")
+        st.subheader("Access to 20 Years of Financial data and Intrinsic value Calculation! ")
+    st.sidebar.markdown("# Stock Overview") 
+    st.sidebar.markdown("Get 20 year+ financial data and charts on relevant metrics")
+    #st.title("Investment Buddy")
+    #st.subheader("Get a Financial overview of companies and their intrinsic value!")
     st.write("##")
-    submit, tckr, growth, sl, dr = get_stock_tickr()
+    submit, tckr = get_stock_tickr()
     print(tckr)
 
     if submit == True:
         try:
-            quote, data, dcf_value = main(tckr, growth, sl, dr)
+            quote, df_inc, df_bal, df_cash = get_financials(tckr)
         except:
             st.warning("Sorry, wrong ticker symbol. Try 'AAPL', 'MSFT' or 'NFLX'")
             st.stop()
-        #data, dcf_value = main(tckr, growth, sl, dr)
-        #st.dataframe(data)
+        #st.write(df_inc)
+        #st.write(df_bal)
+        #st.write(df_cash)
+        data_frames = [df_inc, df_bal, df_cash]
+        data = reduce(lambda  left,right: pd.merge(left,right,on=['date'],
+                                            how='outer'), data_frames)
+        #st.write(data)
+        #
         st.header(quote['Name']+' financial overview')
         st.write("##")
         rev, net_inc, fcf = st.columns(3)
@@ -49,40 +70,35 @@ def landing_page():
         with shares_out:
             #st.subheader('Shares Outstanding')
             plot_bar_chart2(data,'date','shares_out','Shares Outstanding (mill)')
-
-        st.header('Valuation')
-        submit_request, tckr1, growth1, sl1, dr1  = dcf_calculator()
-        if dcf_value != 'NA' and dcf_value >= 0:
-            if 'T' in quote['MarketCapitalization']:
-                quote['MarketCapitalization'] = re.sub(r'T', '', quote['MarketCapitalization'])
-                quote['MarketCapitalization'] = 1000000*float(quote['MarketCapitalization'])
-            elif 'B' in quote['MarketCapitalization']:
-                quote['MarketCapitalization'] = re.sub(r'B', '', quote['MarketCapitalization'])
-                quote['MarketCapitalization'] = 1000*float(quote['MarketCapitalization'])
-            #quote['MarketCapitalization'] = re.sub(r'T', '000000', quote['MarketCapitalization'])
-            #quote['MarketCapitalization'] = re.sub(r'B', '000000', quote['MarketCapitalization'])
-
-            val_data = [['MCap',quote['MarketCapitalization']],['DCF Value',dcf_value]]
-            #val_df = val_df.set_index
-            val_df = pd.DataFrame(val_data, columns=['Label', 'Value'])
-            #val_df = val_df.set_index('Label')
-
-            #print(val_df)
-            #plot_bar_chart(val_df)
-            plot_val_chart(val_df,'Value','Label')
-            #st.bar_chart(val_df)
-            st.write("DCF Valuation:  "+str(int(dcf_value)))
-            st.write("Current MCap:  "+str(int(quote['MarketCapitalization'])))
-            
-            margin_of_safety = int(((dcf_value/quote['MarketCapitalization'])-1)*100)
-            if margin_of_safety <= 0:
-                st.write(f'<b style="color:#d6616b">{"Margin of Safety:  "+str(margin_of_safety)+"%"}</b>', unsafe_allow_html=True)
-            else:
-                st.write(f'<b style="color:#74c476">{"Margin of Safety:  "+str(margin_of_safety)+"%"}</b>', unsafe_allow_html=True)
-            #st.write("Margin of Safety : "+str(margin_of_safety)+"%")
-        else:
-            st.warning("Sorry, DCF Calculation doesn't work on loss making companies.")
         
+        st.write('# Financials')
+
+        st.subheader('Income Statement')
+        df_1 = process_df(df_inc)
+        st.dataframe(df_1, width=1200)
+
+        st.subheader('Balance Sheet')
+        df_bal['Debt_eq'] = df_bal['Debt_eq'].round(2)
+        df_bal.pop('net_cash')
+        df_2 = process_df(df_bal)
+        st.dataframe(df_2, width=1200)
+
+        st.subheader('Cash Flow Statement')
+        df_3 = process_df(df_cash)
+        st.dataframe(df_3, width=1200)
+        #st.table(data.T)
+
+def process_df(df):
+    df.index = df['date']
+    df.rename(columns = {'Net_inc':'Net Income', 'Fcf':'Free Cash FLow',
+                            'Debt_eq':'Debt/Equity', 'st_debt':'Short Term Debt', 'lg_debt':'Long Term Debt', 
+                            'shares_out':'Shares Outstanding', 'cash_eq':'Cash & Equivalents', 'st_equity':'Shareholder\'s Equity'}, inplace = True)
+    df.pop('date')
+    df = df.T
+    df.fillna('--', inplace=True)
+    df = df.applymap(str)
+    return df
+
 def plot_change_chart(data,X,Y):
     #data['changeYoY'] = data[Y].diff() / data[Y].abs().shift()
     data['changeYoY'] = (data[Y].diff() / data[Y].abs().shift())*100
@@ -163,72 +179,17 @@ def plot_bar_chart(data,X,Y,T):
 
     st.altair_chart(chart, use_container_width=True)
 
-def plot_val_chart(data,x,y):
-    # Horizontal stacked bar chart
-    chart = (
-        alt.Chart(data)
-        .mark_bar()
-        .encode(
-            x=alt.X(x, type="quantitative", title=""),
-            y=alt.Y(y, type="nominal", title=""),
-            color=alt.Color(y, type="nominal", title=""),
-            #order=alt.Order("variable", sort="descending"),
-        ).properties(height=200)
-    )
-
-    st.altair_chart(chart, use_container_width=True)
-
 
 def get_stock_tickr():
     with st.form(key = 'ticker', clear_on_submit=False):
         ticker, submit  = st.columns([3,1])
-        gr_avg, text, gr_num, slowdown, discount = st.columns([1,0.15,1,1,1])
         with ticker:
-            tckr = st.text_input('Stock ticker')
-        with gr_avg:
-            gr_avg = st.selectbox('Infer Growth rate',('Select','3yr Avg','5yr Avg'))
-        with text:
-            st.write("##")
-            st.text(" OR ")
-        with gr_num:
-            gr_num = st.number_input('Input Growth rate', 0.0, 100.0, 12.0, 0.5, help = 'Growth rate for next 10 years \nlow: 5 \nmoderate: 10 \nhigh: 15')
-        with slowdown:
-            sl = st.number_input('Slowdown rate YoY', 0.0, 100.0, 0.5,0.5)
-        with discount:
-            dr = st.number_input('Discount rate', 0.0, 100.0, 13.5,0.5)
+            tckr = st.text_input('Stock Ticker')
         with submit:
             st.write("##")
             submit_request = st.form_submit_button(label = 'Submit')
-        if gr_avg != 'Select':
-            growth = gr_avg
-        else:
-            growth = gr_num
-    return submit_request, tckr, growth, sl, dr 
 
-def dcf_calculator():
-    with st.form(key = 'dcf', clear_on_submit=False):
-        ticker, submit  = st.columns([3,1])
-        gr_avg, text, gr_num, slowdown, discount = st.columns([1,0.15,1,1,1])
-    with ticker:
-        tckr = st.text_input('Stock ticker')
-    with gr_avg:
-        gr_avg = st.selectbox('Infer Growth rate',('Select','3yr Avg','5yr Avg'))
-    with text:
-        st.write("##")
-        st.text(" OR ")
-    with gr_num:
-        gr_num = st.number_input('Input Growth rate', 0.0, 100.0, 12.0, 0.5, help = 'Growth rate for next 10 years \nlow: 5 \nmoderate: 10 \nhigh: 15')
-    with slowdown:
-        sl = st.number_input('Slowdown rate YoY', 0.0, 100.0, 0.5,0.5)
-    with discount:
-        dr = st.number_input('Discount rate', 0.0, 100.0, 13.5,0.5)
-    with submit:
-        st.write("##")
-        submit_request = st.form_submit_button(label = 'Submit')
-    if gr_avg != 'Select':
-        growth = gr_avg
-    else:
-        growth = gr_num
-    return submit_request, tckr, growth, sl, dr 
+    return submit_request, tckr
+
 
 landing_page() 
