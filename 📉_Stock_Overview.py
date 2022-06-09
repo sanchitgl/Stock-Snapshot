@@ -31,6 +31,7 @@ def landing_page():
     print(tckr)
 
     if submit == True:
+        print(tckr)
         try:
             quote, df_inc, df_bal, df_cash = get_financials(tckr)
         except:

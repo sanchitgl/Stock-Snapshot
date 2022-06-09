@@ -1,12 +1,13 @@
 import pandas as pd
 import numpy as np
 import math
+import numpy_financial as npf
 
 def compound(p,r):   
     amt = p * (1 + (r/100))
     return amt
 
-def DCFvalue(x, gr1_3, gr4_6, gr7_9, ter_rate, discount):
+def DCFvalue(x, gr1_3, gr4_6, gr7_9, ter_rate, discount, net_debt):
     amt_1 = (x[-3]+x[-2]+x[-1])/3
     amt = (x[-3]+x[-2]+x[-1])/3
     rates = []
@@ -38,11 +39,14 @@ def DCFvalue(x, gr1_3, gr4_6, gr7_9, ter_rate, discount):
     ter_amt = amts[-1]*(1 + (ter_rate/100))
     #print(ter_amt)
     terminal_value = ter_amt/(discount- ter_rate/100)
+    pv_terminal_value = -1*(npf.pv(discount, 10, 0, terminal_value, when='end'))
+    #terminal_values, pv_terminal_value = get_npv(discount, [terminal_value])
     #print(terminal_value)
 
-    total_npv = npv+terminal_value
+    total_npv = npv+pv_terminal_value - net_debt
     #total_npv = terminal_value
-    return amt_1, amts, rates, npv_values, npv, terminal_value, total_npv
+    return amt_1, amts, rates, npv_values, npv, terminal_value, pv_terminal_value, total_npv
+
 
 def get_npv(rate, values):
     #print(rate)

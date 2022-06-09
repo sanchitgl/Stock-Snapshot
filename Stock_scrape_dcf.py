@@ -121,9 +121,15 @@ def get_quote(stock_ticker):
     NI = list(NI)
     FCF = pd.to_numeric(pd.Series(scrape_values('Free Cash Flow',page_body)),errors= 'coerce')
     FCF = list(FCF)
+    st_debt = pd.to_numeric(pd.Series(scrape_values2('>Short\-Term Debt',page_body)),errors= 'coerce')
+    lg_debt = pd.to_numeric(pd.Series(scrape_values2('Long\-Term Debt',page_body)),errors= 'coerce')
+    cash_eq = pd.to_numeric(pd.Series(scrape_values2('Cash \&amp\; Short-Term Investments',page_body)),errors= 'coerce')
+    net_debt_list = list((st_debt.fillna(0)+ lg_debt.fillna(0))- cash_eq)
+    net_debt = net_debt_list[-1]
+    #print(net_debt)
     quote = {'MarketCapitalization':str(scrape_quote('>P/E to S\&amp\;P500',page_body)),
                 'Name' : company_name }
-    return NI, FCF, quote
+    return NI, FCF, net_debt, quote
 
 
 # def main(company_ticker):

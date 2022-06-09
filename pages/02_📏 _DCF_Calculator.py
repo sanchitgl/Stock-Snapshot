@@ -33,17 +33,17 @@ def dcf_calculator():
     with ticker:
         tckr = st.text_input('Stock Ticker')
     with gr1_3:
-        gr1_3 = st.number_input('Growth 1-3 Yr', 0.0, 100.0, 10.0, 0.5, help = 'low: 5, moderate: 10, high: 15')
+        gr1_3 = st.number_input('Growth 1-3 Yr', 0.0, 100.0, 12.0, 0.5, help = 'low: 5, moderate: 10, high: 15')
     with gr4_6:
-        gr4_6 = st.number_input('Growth 4-6 Yr', 0.0, 100.0, 8.0, 0.5, help = 'low: 5, moderate: 10, high: 15')
+        gr4_6 = st.number_input('Growth 4-6 Yr', 0.0, 100.0, 10.0, 0.5, help = 'low: 5, moderate: 10, high: 15')
     with gr7_9:
-        gr7_9 = st.number_input('Growth 7-9 Yr', 0.0, 100.0, 6.0, 0.5, help = 'low: 5, moderate: 10, high: 15')
+        gr7_9 = st.number_input('Growth 7-9 Yr', 0.0, 100.0, 8.0, 0.5, help = 'low: 5, moderate: 10, high: 15')
     with fcf_ni:
         fcf_ni = st.radio("",('FCF', 'NI'))
     with ter_rate:
-        ter_rate = st.number_input('Terminal Growth', 0.0, 100.0, 4.0, 0.5, help = 'Terminal growth rate, Global avg: 4')
+        ter_rate = st.number_input('Terminal Growth', 0.0, 100.0, 5.0, 0.5, help = 'Terminal growth rate, Global avg: 4')
     with discount:
-        dr = st.number_input('Discount rate', 0.0, 100.0, 13.5,0.5)
+        dr = st.number_input('Discount rate', 0.0, 100.0, 12.5,0.5)
     with submit:
         st.write('##')
         submit_request = st.form_submit_button(label = 'Submit')
@@ -55,14 +55,18 @@ def landing_page():
     submit, tckr, gr1_3, gr4_6, gr7_9, fcf_ni, ter_rate, discount  = dcf_calculator()
 
     if submit == True:
-        #print('YESS')
+        print(tckr)
         #st.write(submit)
-        NI, FCF, quote = get_quote(tckr)
+        try:
+            NI, FCF, net_debt, quote = get_quote(tckr)
         #print(NI, FCF, quote )
+        except:
+            st.warning("Sorry, wrong ticker symbol. Try 'AAPL', 'NVDA' or 'BABA'")
+            st.stop()
         if fcf_ni == 'FCF':
-            amt, amts, rates, npv_values, npv, terminal_value, dcf_value = DCFvalue(FCF, gr1_3, gr4_6, gr7_9, ter_rate, discount/100)
+            amt, amts, rates, npv_values, npv, terminal_value, pv_terminal_value, dcf_value = DCFvalue(FCF, gr1_3, gr4_6, gr7_9, ter_rate, discount/100, net_debt)
         else:
-            amt, amts, rates, npv_values, npv, terminal_value, dcf_value = DCFvalue(NI, gr1_3, gr4_6, gr7_9, ter_rate, discount/100)
+            amt, amts, rates, npv_values, npv, terminal_value, pv_terminal_value, dcf_value = DCFvalue(NI, gr1_3, gr4_6, gr7_9, ter_rate, discount/100, net_debt)
         #st.write(dcf_value)
         #print(dcf_value)
         if dcf_value != 'NA' and dcf_value >= 0:
@@ -99,9 +103,11 @@ def landing_page():
             npv_df = npv_df.applymap(str)
             with st.expander('Calculation'):
                 st.markdown('Year 0 cashflow(last 3yr Avg) =  &nbsp;'+ str(int(amt)) + ' mil')
-                st.write(npv_df.T)
+                st.dataframe(npv_df.T, width=1000)
                 st.markdown('Total PV of all future Cashflows =  &nbsp;'+ str(int(npv))+ ' mil')
                 st.markdown('Terminal value using rate '+str(ter_rate)+'% =  &nbsp;'+str(int(terminal_value))+ ' mil')
+                st.markdown('PV of Terminal value  =  &nbsp;'+str(int(pv_terminal_value))+ ' mil')
+                st.markdown('Subtract Net Debt =  &nbsp;'+str(int(net_debt))+ ' mil')
                 st.markdown('Net PV of the company = &nbsp; **' +str(int(dcf_value))+ '** mil')
             
             st.write("Current MCap: &nbsp; **"+str(int(quote['MarketCapitalization']))+' million**')
