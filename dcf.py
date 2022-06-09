@@ -8,8 +8,8 @@ def compound(p,r):
     return amt
 
 def DCFvalue(x, gr1_3, gr4_6, gr7_9, ter_rate, discount, net_debt):
-    amt_1 = (x[-3]+x[-2]+x[-1])/3
-    amt = (x[-3]+x[-2]+x[-1])/3
+    amt_1 = x[-1]
+    amt = x[-1]
     rates = []
     #print(gr1_3)
     #print(amt)

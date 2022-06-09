@@ -104,7 +104,7 @@ def landing_page():
             npv_df.pop('Year')
             npv_df = npv_df.applymap(str)
             with st.expander('Calculation'):
-                st.markdown('Year 0 cashflow(last 3yr Avg) =  &nbsp;'+ str(int(amt)) + ' mil')
+                st.markdown('Year 0 cashflow (Last year) =  &nbsp;'+ str(int(amt)) + ' mil')
                 st.dataframe(npv_df.T, width=1000)
                 st.markdown('Total PV of all future Cashflows =  &nbsp;'+ str(int(npv))+ ' mil')
                 st.markdown('Terminal value using rate '+str(ter_rate)+'% =  &nbsp;'+str(int(terminal_value))+ ' mil')
