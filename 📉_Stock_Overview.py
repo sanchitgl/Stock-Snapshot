@@ -7,12 +7,13 @@ from functools import reduce
 from PIL import Image
 #import plotly.express as px
 
+img = Image.open('images/7b5298e4cd264eb283b80da981337b58.png')
+st.set_page_config(
+    page_title="Stock Snapshot",
+    page_icon=img,
+    layout="wide")
+
 def landing_page():
-    img = Image.open('images/7b5298e4cd264eb283b80da981337b58.png')
-    st.set_page_config(
-     page_title="Stock Snapshot",
-     page_icon=img,
-     layout="wide")
 
     logo, title = st.columns([1,4])
     with logo:

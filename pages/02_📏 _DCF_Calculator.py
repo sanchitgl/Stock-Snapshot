@@ -10,7 +10,6 @@ st.sidebar.markdown(" DCF Calculator")
 st.sidebar.markdown("Calculate Intrinsic value of a company through dicounted cash flow model!")
 st.sidebar.markdown("If you are new to DCF, check out this [link](https://www.investopedia.com/terms/d/dcf.asp) to read about it more.")
 
-
 def plot_val_chart(data,x,y):
     # Horizontal stacked bar chart
     chart = (
@@ -55,6 +54,9 @@ def landing_page():
     submit, tckr, gr1_3, gr4_6, gr7_9, fcf_ni, ter_rate, discount  = dcf_calculator()
 
     if submit == True:
+        if discount <= ter_rate:
+            st.warning("Sorry, discount rate can't be less than terminal rate.'")
+            st.stop()
         print(tckr)
         #st.write(submit)
         try:
