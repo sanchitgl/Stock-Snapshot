@@ -5,6 +5,7 @@ import re
 import altair as alt
 from functools import reduce
 from PIL import Image
+import streamlit.components.v1 as components
 #import plotly.express as px
 
 img = Image.open('images/7b5298e4cd264eb283b80da981337b58.png')
@@ -14,7 +15,6 @@ st.set_page_config(
     layout="wide")
 
 def landing_page():
-
     logo, title = st.columns([1,4])
     with logo:
         st.image(img)
