@@ -4,7 +4,9 @@ from Stock_scrape_dcf import get_quote
 from dcf import DCFvalue
 import re
 import altair as alt
-
+col1, col2, col3 = st.columns([1.4,3,1])
+with col2:
+    st.write("If you like my work and want to support, [buy me a coffee?](https://www.buymeacoffee.com/stocksnapshot)")
 st.markdown("# DCF Calculator")
 st.sidebar.markdown(" DCF Calculator")
 st.sidebar.markdown("Calculate Intrinsic value of a company through dicounted cash flow model!")
@@ -18,7 +20,7 @@ def plot_val_chart(data,x,y):
         .encode(
             x=alt.X(x, type="quantitative", title=""),
             y=alt.Y(y, type="nominal", title=""),
-            color=alt.Color(y, type="nominal", title=""),
+            color=alt.Color(y, type="nominal", title="", legend = None),
             #order=alt.Order("variable", sort="descending"),
         ).properties(height=200)
     )
@@ -27,8 +29,8 @@ def plot_val_chart(data,x,y):
 
 def dcf_calculator():
     with st.form(key = 'dcf', clear_on_submit=False):
-        ticker, discount, fcf_ni, submit  = st.columns([2,1,0.4,0.5])
-        gr1_3, gr4_6, gr7_9, ter_rate = st.columns([1,1,1,1])
+        ticker, discount, gr1_3  = st.columns([2,1,1])
+        gr4_6, gr7_9, ter_rate, fcf_ni, submit= st.columns([1,1,1,0.4,0.5])
     with ticker:
         tckr = st.text_input('Stock Ticker')
     with gr1_3:
@@ -60,7 +62,7 @@ def landing_page():
         print(tckr)
         #st.write(submit)
         try:
-            NI, FCF, net_debt, quote = get_quote(tckr)
+            NI, FCF, net_debt, quote = get_quote(tckr.strip())
         #print(NI, FCF, quote )
         except:
             st.warning("Sorry, wrong ticker symbol. Try 'AAPL', 'NVDA' or 'BABA'")

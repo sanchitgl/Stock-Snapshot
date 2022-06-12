@@ -52,6 +52,7 @@ def get_financials(stock_ticker):
     page = requests.get('https://roic.ai/financials/'+stock_ticker)
     soup = BeautifulSoup(page.content, 'html.parser')
     page_body = soup.body
+    #print(page_body)
      
     name = soup.find('title')
     company_name = name.string.split('·')[0]
@@ -80,7 +81,7 @@ def get_financials(stock_ticker):
     df_bal['Total Liabilities']= pd.to_numeric(pd.Series(scrape_values('Total Liabilities',page_body)),errors= 'coerce')
     df_bal['Retained Earnings']= pd.to_numeric(pd.Series(scrape_values2('Retained Earnings',page_body)),errors= 'coerce')
     df_bal['st_equity']= pd.to_numeric(pd.Series(scrape_values('Total Stockholders Equity',page_body)),errors= 'coerce')
-    df_bal['Debt_eq']= (df_bal['lg_debt']+df_bal['st_debt'])/df_bal['st_equity']
+    df_bal['Debt_eq']= (df_bal['lg_debt'].fillna(0)+df_bal['st_debt'].fillna(0))/df_bal['st_equity']
     df_bal['net_cash']= df_bal['cash_eq'] -(df_bal['st_debt'].fillna(0)+df_bal['lg_debt'].fillna(0))
 
     df_cash = pd.DataFrame()

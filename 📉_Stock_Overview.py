@@ -6,6 +6,7 @@ import altair as alt
 from functools import reduce
 from PIL import Image
 import streamlit.components.v1 as components
+import io
 #import plotly.express as px
 
 img = Image.open('images/7b5298e4cd264eb283b80da981337b58.png')
@@ -15,6 +16,10 @@ st.set_page_config(
     layout="wide")
 
 def landing_page():
+    col1, col2, col3 = st.columns([1.6,3,1])
+    with col2:
+        st.write("If you like my work and want to support, [buy me a coffee?](https://www.buymeacoffee.com/stocksnapshot)")
+    st.write('##')
     logo, title = st.columns([1,4])
     with logo:
         st.image(img)
@@ -29,7 +34,7 @@ def landing_page():
     #st.title("Investment Buddy")
     #st.subheader("Get a Financial overview of companies and their intrinsic value!")
     submit, tckr = get_stock_tickr()
-    print(tckr)
+    #print(tckr)
 
     if submit == True:
         print(tckr)
@@ -75,20 +80,26 @@ def landing_page():
             #st.subheader('Shares Outstanding')
             plot_bar_chart2(data,'date','shares_out','Shares Outstanding (mill)')
         
-        st.write('# Financials')
-
-        st.subheader('Income Statement')
         df_1 = process_df(df_inc)
-        st.dataframe(df_1, width=1200)
-
-        st.subheader('Balance Sheet')
         df_bal['Debt_eq'] = df_bal['Debt_eq'].round(2)
         df_bal.pop('net_cash')
         df_2 = process_df(df_bal)
+        df_3 = process_df(df_cash)
+        
+        text, download_button, empty = st.columns([1,1,2])
+        with text:
+            st.write('# Financials')
+        with download_button:
+            st.write('##')
+            download_excel(tckr, df_1, df_2, df_3)
+
+        st.subheader('Income Statement')
+        st.dataframe(df_1, width=1200)
+
+        st.subheader('Balance Sheet')
         st.dataframe(df_2, width=1200)
 
         st.subheader('Cash Flow Statement')
-        df_3 = process_df(df_cash)
         st.dataframe(df_3, width=1200)
         #st.table(data.T)
 
@@ -182,6 +193,26 @@ def plot_bar_chart(data,X,Y,T):
     chart = (bar + line).configure_title(fontSize=20)
 
     st.altair_chart(chart, use_container_width=True)
+
+def download_excel(tckr, df_1, df_2, df_3):
+    buffer = io.BytesIO()
+
+    # Create a Pandas Excel writer using XlsxWriter as the engine.
+    with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+        # Write each dataframe to a different worksheet.
+        df_1.to_excel(writer, sheet_name='Income Statement')
+        df_2.to_excel(writer, sheet_name='Balance Sheet')
+        df_3.to_excel(writer, sheet_name='Cash Flow')
+
+        # Close the Pandas Excel writer and output the Excel file to the buffer
+        writer.save()
+
+        st.download_button(
+            label="Download in Excel",
+            data=buffer,
+            file_name=str(tckr)+"_financials.xlsx",
+            mime="application/vnd.ms-excel"
+        )
 
 
 def get_stock_tickr():
