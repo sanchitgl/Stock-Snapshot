@@ -3,6 +3,9 @@ from bs4 import BeautifulSoup
 import re
 import pandas as pd
 import numpy as np
+import undetected_chromedriver as uc
+from selenium import webdriver
+import cloudscraper
 
 def scrape_values(text,page_body):
     values = []
@@ -49,7 +52,12 @@ def scrape_quote(text, page_body):
     return result.text
 
 def get_financials(stock_ticker):
-    page = requests.get('https://roic.ai/financials/'+stock_ticker)
+    scraper = cloudscraper.create_scraper( browser='chrome')
+    #options.add_argument("start-maximized")
+    #driver = uc.Chrome()#options=options)
+    page = scraper.get('https://roic.ai/financials/'+stock_ticker)
+
+    #page = requests.get('https://roic.ai/financials/'+stock_ticker)
     soup = BeautifulSoup(page.content, 'html.parser')
     print(soup)
     #st.text(soup)
