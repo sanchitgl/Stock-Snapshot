@@ -38,11 +38,11 @@ def landing_page():
 
     if submit == True:
         print(tckr)
-        try:
-            quote, df_inc, df_bal, df_cash = get_financials(tckr)
-        except:
-            st.warning("Sorry, wrong ticker symbol. Try 'AAPL', 'MSFT' or 'NFLX'")
-            st.stop()
+        
+        quote, df_inc, df_bal, df_cash = get_financials(tckr)
+        # except:
+        #     st.warning("Sorry, wrong ticker symbol. Try 'AAPL', 'MSFT' or 'NFLX'")
+        #     st.stop()
         #st.write(df_inc)
         #st.write(df_bal)
         #st.write(df_cash)
