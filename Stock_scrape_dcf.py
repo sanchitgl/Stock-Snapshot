@@ -52,7 +52,7 @@ def get_financials(stock_ticker):
     page = requests.get('https://roic.ai/financials/'+stock_ticker)
     soup = BeautifulSoup(page.content, 'html.parser')
     page_body = soup.body
-    #print(page_body)
+    print(page_body)
      
     name = soup.find('title')
     company_name = name.string.split('·')[0]
