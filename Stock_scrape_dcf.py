@@ -1,10 +1,8 @@
-import requests
+
 from bs4 import BeautifulSoup
 import re
 import pandas as pd
 import numpy as np
-import undetected_chromedriver as uc
-from selenium import webdriver
 import cloudscraper
 
 def scrape_values(text,page_body):
@@ -59,10 +57,10 @@ def get_financials(stock_ticker):
 
     #page = requests.get('https://roic.ai/financials/'+stock_ticker)
     soup = BeautifulSoup(page.content, 'html.parser')
-    print(soup)
+    #print(soup)
     #st.text(soup)
     page_body = soup.body
-    print(page_body)
+    #print(page_body)
      
     name = soup.find('title')
     company_name = name.string.split('·')[0]
@@ -121,7 +119,8 @@ def get_financials(stock_ticker):
     return quote, df_inc, df_bal, df_cash
 
 def get_quote(stock_ticker):
-    page = requests.get('https://roic.ai/financials/'+stock_ticker)
+    scraper = cloudscraper.create_scraper( browser='chrome')
+    page = scraper.get('https://roic.ai/financials/'+stock_ticker)
     soup = BeautifulSoup(page.content, 'html.parser')
     page_body = soup.body
      

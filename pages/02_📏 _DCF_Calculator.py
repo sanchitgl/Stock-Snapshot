@@ -4,6 +4,7 @@ from Stock_scrape_dcf import get_quote
 from dcf import DCFvalue
 import re
 import altair as alt
+
 col1, col2, col3 = st.columns([1.4,3,1])
 with col2:
     st.write("If you like my work and want to support, [buy me a coffee?](https://www.buymeacoffee.com/stocksnapshot)")
