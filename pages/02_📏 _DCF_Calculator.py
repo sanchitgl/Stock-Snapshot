@@ -55,7 +55,7 @@ def dcf_calculator():
 def landing_page():
     #st.header('Valuation')
     submit, tckr, gr1_3, gr4_6, gr7_9, fcf_ni, ter_rate, discount  = dcf_calculator()
-
+    st.info("We have switched to a new Domain, bookmark it for future!! - [Take me there](https://stocksnapshot.herokuapp.com/)")
     if submit == True:
         if discount <= ter_rate:
             st.warning("Sorry, discount rate can't be less than terminal rate.'")

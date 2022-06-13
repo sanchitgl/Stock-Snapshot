@@ -26,7 +26,7 @@ def landing_page():
     with title:
         st.title(" Your One-stop Stock Analysis Tool")
         st.subheader("Access to 20 Years of Financial data and Intrinsic value Calculation! ")
-    st.info("Quarterly data and charts are coming soon!")
+    st.info("We have switched to a new Domain, bookmark it for future!! - [Take me there](https://stocksnapshot.herokuapp.com/)")
     st.sidebar.markdown("# Stock Overview") 
     st.sidebar.markdown("Get 20 year+ financial data and charts on relevant metrics")
     st.write('##')
