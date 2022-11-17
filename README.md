@@ -12,5 +12,5 @@ It scrapes over 20yr+ financial data from various websites and provides a financ
 
 2. Use the DCF calculator to get the valuation of the compnay using your estimated growth rates:
 
-![Screenshot 2022-11-18 at 3 38 36 AM](https://user-images.githubusercontent.com/105559691/202571580-1fa85341-9bc8-44f6-a385-78b0b4f280c3.png)
-![Screenshot 2022-11-18 at 3 38 54 AM](https://user-images.githubusercontent.com/105559691/202571601-af1c2865-35df-4819-88b7-6242cbb6c2e2.png)
+![Screenshot 2022-11-18 at 3 47 19 AM](https://user-images.githubusercontent.com/105559691/202572050-66e2a2f4-0650-4219-b557-52036bab47a1.png)
+![Screenshot 2022-11-18 at 3 47 36 AM](https://user-images.githubusercontent.com/105559691/202572057-737b07f1-6fc4-4457-8368-efdbe51dd5dd.png)
