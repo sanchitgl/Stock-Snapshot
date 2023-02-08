@@ -1,4 +1,4 @@
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://twitterazzi.streamlit.app/)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://stocksnapshot.streamlit.app/)
 # Stock-Snapshot
 
 One stop stock analysis tool. Get stock financial overview of over 20 yers with a built in Discounted cash flow(DCF) calculator for stock valuation.
